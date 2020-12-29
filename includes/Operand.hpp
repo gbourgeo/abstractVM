@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/06 01:28:13 by gbourgeo          #+#    #+#             */
-/*   Updated: 2019/08/06 01:47:50 by gbourgeo         ###   ########.fr       */
+//   Updated: 2020/12/28 17:03:27 by gbourgeo         ###   ########.fr       //
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,4 +40,4 @@ private:
 	int				_precision;
 };
 
-#endif
+#endif	// OPERAND_HPP

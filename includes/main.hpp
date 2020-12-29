@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   main.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/07/26 21:36:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2019/08/06 01:40:48 by gbourgeo         ###   ########.fr       */
+/*   Created: 2020/12/28 17:02:15 by gbourgeo          #+#    #+#             */
+/*   Updated: 2020/12/29 09:00:25 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int		main(int ac, char **av)
-{
-	if (ac == 1)
-		return (2);
-	if (!av[1])
-		return (3);
-	return (0);
-}
+#ifndef MAIN_HPP
+# define MAIN_HPP
+
+# include <fstream>
+# include <iostream>
+# include <string>
+
+#endif	// MAIN_HPP
