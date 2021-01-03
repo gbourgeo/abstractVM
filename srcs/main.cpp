@@ -6,34 +6,39 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/26 21:36:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2020/12/29 09:55:13 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/03 21:03:55 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.hpp"
+#include "LexerParser.hpp"
+#include "Token.hpp"
+#include "OperandFactory.hpp"
 
 int		main(int ac, const char **av)
 {
-	std::fstream	ifs;
-	std::streambuf	*cinbuf;
-	std::string		line("");
+	try
+	{
+		LexerParser		lp(av[1]);
+		Token			token;
 
-	cinbuf = std::cin.rdbuf();
-	if (ac > 1)
-	{
-		ifs.open(av[1], std::ios::binary | std::ios::in);
-		if (ifs.good() == false)
-		{
-			std::cerr << "Error opening " << av[1] << std::endl;
-			return 1;
-		}
-		std::cin.rdbuf(ifs.rdbuf());
+		lp.tokenise(token);
+		lp.parse(token);
 	}
-	while (std::getline(std::cin, line))
+	catch (LexerParser::OpenFileException & e)
 	{
-		std::cout << "line : " << line << std::endl;
+		std::cerr << e.what() << std::endl;
 	}
-	std::cin.rdbuf(cinbuf);
-	std::cout << "BYE" << std::endl;
+	catch (LexerParser::LexerParserException & e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+
+	OperandFactory	o;
+	const IOperand *i = o.createOperand(Float, "10");
+	std::cout << i->toString() << std::endl;
+	delete i;
+
+	(void)ac;
 	return (0);
 }

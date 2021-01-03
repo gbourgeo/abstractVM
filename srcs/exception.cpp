@@ -1,19 +1,13 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.hpp                                           :+:      :+:    :+:   */
+/*   exception.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/28 17:02:15 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/03 11:34:04 by gbourgeo         ###   ########.fr       */
+/*   Created: 2021/01/02 14:29:41 by gbourgeo          #+#    #+#             */
+/*   Updated: 2021/01/02 14:29:49 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAIN_HPP
-# define MAIN_HPP
-
-# include <iostream>
-# include <string>
-
-#endif	// MAIN_HPP
+#include "exception.hpp"

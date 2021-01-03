@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/06 01:28:13 by gbourgeo          #+#    #+#             */
-//   Updated: 2020/12/28 17:03:27 by gbourgeo         ###   ########.fr       //
+/*   Updated: 2021/01/02 14:19:52 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # include "IOperand.hpp"
 
-template <typename T>
 class Operand: public IOperand
 {
 public:
@@ -34,8 +33,11 @@ public:
 
 	std::string const & toString( void ) const;
 
+	Operand(std::string const & value, eOperandType type);
+	Operand(std::string const & value, eOperandType type, int precision);
+
 private:
-	T				_value;
+	std::string		_value;
 	eOperandType	_type;
 	int				_precision;
 };

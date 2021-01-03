@@ -1,19 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.hpp                                           :+:      :+:    :+:   */
+/*   exception.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/28 17:02:15 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/03 11:34:04 by gbourgeo         ###   ########.fr       */
+/*   Created: 2021/01/02 14:23:43 by gbourgeo          #+#    #+#             */
+/*   Updated: 2021/01/02 14:29:19 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAIN_HPP
-# define MAIN_HPP
+#ifndef EXCEPTION_HPP
+# define EXCEPTION_HPP
 
-# include <iostream>
-# include <string>
+# include <stdexcept>
 
-#endif	// MAIN_HPP
+class Exception: public std::exception
+{
+public:
+	Exception();
+	~Exception();
+	Exception(Exception const & src);
+	Exception & operator=(Exception const & rhs);
+};
+
+#endif // EXCEPTION_HPP

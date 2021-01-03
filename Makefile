@@ -6,14 +6,18 @@
 #    By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/07/26 21:29:25 by gbourgeo          #+#    #+#              #
-#    Updated: 2019/07/26 21:40:27 by gbourgeo         ###   ########.fr        #
+#    Updated: 2021/01/03 20:58:58 by gbourgeo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= avm
 
 SRC_D	= srcs/
-SRC_F	= main.cpp
+SRC_F	= main.cpp			\
+		Operand.cpp			\
+		OperandFactory.cpp	\
+		LexerParser.cpp		\
+		Token.cpp			\
 
 INC_D	= includes/
 
@@ -29,10 +33,10 @@ objs:
 	mkdir -p $@
 
 $(NAME): $(OBJ_F)
-	$(CC) -o $@ $<
+	$(CC) -o $@ $^
 
 $(OBJ_D)%.o: $(SRC_D)%.cpp
-	$(CC) $(FLAGS) -o $@ -c $^ -I $(INC_D)
+	$(CC) $(FLAGS) -o $@ -c $< -I $(INC_D)
 
 clean:
 	/bin/rm -rf $(OBJ_D)
