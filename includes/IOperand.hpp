@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/26 21:42:03 by gbourgeo          #+#    #+#             */
-/*   Updated: 2020/12/29 20:06:18 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/09 22:40:01 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ enum eOperandType {
 	Int16,
 	Int32,
 	Float,
-	Double
+	Double,
+	Undefined
 };
 
 class IOperand {

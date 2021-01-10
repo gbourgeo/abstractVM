@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:12 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/03 21:00:58 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/10 02:29:37 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,44 +15,45 @@
 
 # include <string>
 # include <vector>
+# include <algorithm>
+# include "OperandFactory.hpp"
 
 class Token
 {
-	public:
-		Token();
-		~Token();
-		Token(Token const & src);
-		Token & operator=(Token const & rhs);
+public:
+	Token();
+	~Token();
+	Token(Token const & src);
+	Token & operator=(Token const & rhs);
+	/* Token type enumeration */
+	enum eTokenType
+	{
+		Push,
+		Pop,
+		Dump,
+		Assert,
+		Add,
+		Sub,
+		Mul,
+		Div,
+		Mod,
+		Print,
+		Exit,
+	};
+	/* Tokens structure */
+	typedef struct	s_token
+	{
+		eTokenType		_type;
+		IOperand const	*ope;
+	}				t_token;
 
-		enum eTokenType
-		{
-			Push,
-			Pop,
-			Dump,
-			Assert,
-			Add,
-			Sub,
-			Mul,
-			Div,
-			Mod,
-			Print,
-			Exit,
-			Comment,
-			End,
-		};
-		void addToken(eTokenType type, std::string & word);
-		void addToken(eTokenType type, std::string & word, std::string & args);
+	void			addToken(eTokenType tokenType, std::string const & operandValue, eOperandType opType);
+	t_token const	*getNextToken( void );
 
-	private:
-		/* Tokens structure */
-		struct s_token
-		{
-			eTokenType		_type;
-			std::string		_word;
-			std::string		_args;
-		};
-		/* Tokens list */
-		std::vector<struct s_token>		_tokens;
+private:
+	/* Tokens list */
+	std::vector<t_token>	_tokens;
+	OperandFactory		_op;
 };
 
 #endif // TOKEN_HPP

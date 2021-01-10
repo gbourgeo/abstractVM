@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/03 20:58:42 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/10 02:40:45 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@ Token::Token()
 
 Token::~Token()
 {
+	auto freePointer = [](Token::t_token const & token) {
+		if (token.ope != nullptr)
+			delete token.ope;
+	};
+	std::for_each(this->_tokens.cbegin(), this->_tokens.cend(), freePointer);
 	this->_tokens.clear();
 }
 
@@ -35,12 +40,25 @@ Token & Token::operator=(Token const & rhs)
 	return *this;
 }
 
-void 	Token::addToken(eTokenType type, std::string & word)
+void	Token::addToken(eTokenType tokenType, std::string const & operandValue, eOperandType opType)
 {
-	this->_tokens.push_back( (struct s_token){ type, word, "" } );
+	if (operandValue.length() == 0)
+	{
+		this->_tokens.push_back( (struct s_token){ tokenType, nullptr } );
+		return;
+	}
+	this->_tokens.push_back( (struct s_token){ tokenType, this->_op.createOperand(opType, operandValue) } );
 }
 
-void	Token::addToken(eTokenType type, std::string & word, std::string & args)
+Token::t_token	const * Token::getNextToken( void )
 {
-	this->_tokens.push_back( (struct s_token){ type, word, args } );
+	static std::size_t	i = 0;
+
+	if (i < this->_tokens.size())
+	{
+		t_token	* tok = &this->_tokens.at(i);
+		i++;
+		return tok;
+	}
+	return nullptr;
 }

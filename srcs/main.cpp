@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/26 21:36:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/03 21:03:55 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/09 13:29:03 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 int		main(int ac, const char **av)
 {
+	(void)ac;
 	try
 	{
 		LexerParser		lp(av[1]);
@@ -33,12 +34,5 @@ int		main(int ac, const char **av)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-
-	OperandFactory	o;
-	const IOperand *i = o.createOperand(Float, "10");
-	std::cout << i->toString() << std::endl;
-	delete i;
-
-	(void)ac;
 	return (0);
 }

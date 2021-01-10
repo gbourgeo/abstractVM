@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 11:27:18 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/03 21:03:44 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/10 02:33:17 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <vector>
 # include <sstream>
 # include <iterator>
+# include <functional>
 # include "Token.hpp"
 
 class LexerParser
@@ -49,7 +50,7 @@ public:
 	class LexerParserException : public std::exception
 	{
 		public:
-			LexerParserException(std::size_t lineNb, const char *error, std::string & instruction);
+			LexerParserException(std::size_t lineNb, const char *error, std::string const & instruction);
 
 			virtual const char * what() const throw()
 			{
@@ -60,16 +61,38 @@ public:
 	};
 
 private:
+	/* Instructions structure */
+	typedef struct	s_instructions
+	{
+		const char			*name;
+		Token::eTokenType	type;
+		std::size_t			nbArgs;
+	}				t_inst;
+	/* Operands structure */
+	typedef struct	s_operands
+	{
+		const char		*name;
+		eOperandType	type;
+		void			(LexerParser::*checkValue)(std::string const &) const;
+	}				t_operands;
+	/* */
+	typedef struct s_result
+	{
+		eOperandType	type;
+		std::string		value;
+	}				t_result;
+
 	const char			*_file;
 	std::fstream		_ifs;
 	std::streambuf		*_cinbuf;
+	std::size_t			_lineNb;
+	static t_inst		_instructions[];
+	static t_operands	_values[];
 
-	typedef struct	s_token
-	{
-		std::size_t			nbArgs;
-		const char			*value;
-		Token::eTokenType	type;
-	}				t_token;
+	t_result		checkOperand(std::string const & operand) const;
+	void			intOperandCheck(std::string const & value) const;
+	void			floatOperandCheck(std::string const & value) const;
+	void			doubleOperandCheck(std::string const & value) const;
 };
 
 # endif // LEXERPARSER_HPP
