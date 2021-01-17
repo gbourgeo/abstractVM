@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LexerParser.hpp                                    :+:      :+:    :+:   */
+/*   Lexer.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/03 11:27:18 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/10 02:33:17 by gbourgeo         ###   ########.fr       */
+/*   Created: 2021/01/17 11:51:19 by gbourgeo          #+#    #+#             */
+/*   Updated: 2021/01/17 11:53:13 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LEXERPARSER_HPP
-# define LEXERPARSER_HPP
+#ifndef LEXER_HPP
+# define LEXER_HPP
 
 # include <fstream>
 # include <iostream>
@@ -22,17 +22,16 @@
 # include <functional>
 # include "Token.hpp"
 
-class LexerParser
+class Lexer
 {
 public:
-	LexerParser();
-	LexerParser(char const * file);
-	~LexerParser();
-	LexerParser(LexerParser const & src);
-	LexerParser & operator=(LexerParser const & rhs);
+	Lexer();
+	Lexer(char const * file);
+	~Lexer();
+	Lexer(Lexer const & src);
+	Lexer & operator=(Lexer const & rhs);
 
 	void		tokenise( Token & token );
-	void		parse( Token & token );
 
 	class OpenFileException : public std::exception
 	{
@@ -47,10 +46,10 @@ public:
 			std::string		_error;
 	};
 
-	class LexerParserException : public std::exception
+	class LexerException : public std::exception
 	{
 		public:
-			LexerParserException(std::size_t lineNb, const char *error, std::string const & instruction);
+			LexerException(std::size_t lineNb, const char *error, std::string const & instruction);
 
 			virtual const char * what() const throw()
 			{
@@ -61,19 +60,25 @@ public:
 	};
 
 private:
-	/* Instructions structure */
+	/*
+	* Instructions structure
+	* instructions handled by the program.
+	*/
 	typedef struct	s_instructions
 	{
 		const char			*name;
 		Token::eTokenType	type;
 		std::size_t			nbArgs;
 	}				t_inst;
-	/* Operands structure */
+	/*
+	* Operands structure
+	* operand name, type and value
+	*/
 	typedef struct	s_operands
 	{
 		const char		*name;
 		eOperandType	type;
-		void			(LexerParser::*checkValue)(std::string const &) const;
+		void			(Lexer::*checkValue)(std::string const &) const;
 	}				t_operands;
 	/* */
 	typedef struct s_result
@@ -95,4 +100,4 @@ private:
 	void			doubleOperandCheck(std::string const & value) const;
 };
 
-# endif // LEXERPARSER_HPP
+# endif // Lexer_HPP

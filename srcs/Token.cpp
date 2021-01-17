@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/10 02:40:45 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/17 21:30:59 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,12 @@ Token & Token::operator=(Token const & rhs)
 
 void	Token::addToken(eTokenType tokenType, std::string const & operandValue, eOperandType opType)
 {
-	if (operandValue.length() == 0)
-	{
-		this->_tokens.push_back( (struct s_token){ tokenType, nullptr } );
-		return;
-	}
 	this->_tokens.push_back( (struct s_token){ tokenType, this->_op.createOperand(opType, operandValue) } );
+}
+
+void	Token::addToken(eTokenType tokenType)
+{
+	this->_tokens.push_back( (struct s_token){ tokenType, nullptr } );
 }
 
 Token::t_token	const * Token::getNextToken( void )
