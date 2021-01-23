@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/06 01:28:13 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/09 19:53:40 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:47:08 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ public:
 	Operand(std::string const & value, eOperandType type, int precision);
 
 private:
-	std::string		_value;
+	std::string				_value;
 	eOperandType	_type;
-	int				_precision;
+	int						_precision;
 };
 
 #endif	// OPERAND_HPP

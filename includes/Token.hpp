@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:12 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/17 21:31:47 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:46:06 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ public:
 		Mod,
 		Print,
 		Exit,
+		Undefined,
 	};
 	/* Tokens structure */
 	typedef struct	s_token
@@ -47,14 +48,14 @@ public:
 		IOperand const	*ope;
 	}				t_token;
 
-	void			addToken(eTokenType tokenType, std::string const & operandValue, eOperandType opType);
-	void			addToken(eTokenType tokenType);
+	void			addToken(Token::eTokenType typeToken, IOperand::eOperandType typeOperand, std::string const & valueOperand);
 	t_token const	*getNextToken( void );
 
 private:
 	/* Tokens list */
 	std::vector<t_token>	_tokens;
 	OperandFactory			_op;
+	std::size_t				_idx;
 };
 
 #endif // TOKEN_HPP

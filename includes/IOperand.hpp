@@ -6,23 +6,24 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/26 21:42:03 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/09 22:40:01 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:23:14 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string>
 
-enum eOperandType {
-	Int8,
-	Int16,
-	Int32,
-	Float,
-	Double,
-	Undefined
-};
-
 class IOperand {
 public:
+
+	enum eOperandType {
+		Int8,
+		Int16,
+		Int32,
+		Float,
+		Double,
+		Undefined
+	};
+
 	virtual int getPrecision( void ) const = 0; // Precision of the type of the instance
 	virtual eOperandType getType( void ) const = 0; // Type of the instance
 

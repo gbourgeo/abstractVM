@@ -6,47 +6,27 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 11:29:03 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/17 21:30:08 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:56:49 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Lexer.hpp"
 
-Lexer::t_inst		Lexer::_instructions[] = {
-	{ "push",   Token::Push,   1 },
-	{ "pop",    Token::Pop,    0 },
-	{ "dump",   Token::Dump,   0 },
-	{ "assert", Token::Assert, 1 },
-	{ "add",    Token::Add,    0 },
-	{ "sub",    Token::Sub,    0 },
-	{ "mul",    Token::Mul,    0 },
-	{ "div",    Token::Div,    0 },
-	{ "mod",    Token::Mod,    0 },
-	{ "print",  Token::Print,  0 },
-	{ "exit",   Token::Exit,   0 },
-};
-
-Lexer::t_operands	Lexer::_values[] = {
-	{ "int8",   Int8  , &Lexer::intOperandCheck },
-	{ "int16",  Int16 , &Lexer::intOperandCheck },
-	{ "int32",  Int32 , &Lexer::intOperandCheck },
-	{ "float",  Float , &Lexer::floatOperandCheck },
-	{ "double", Double, &Lexer::doubleOperandCheck },
-};
-
 Lexer::Lexer():
-	_file(nullptr), _cinbuf(std::cin.rdbuf()), _lineNb(1)
-{}
+	_file(nullptr), _cinbuf(std::cin.rdbuf()), _lineNb(0), _instructions(nullptr)
+{
+	throw Lexer::LexerException(this->_lineNb, this->_instructions);
+}
 
-Lexer::Lexer(char const * file):
-	_file(file), _cinbuf(std::cin.rdbuf()), _lineNb(1)
+Lexer::Lexer(char const * file, Instructions const & instructions):
+	_file(file), _cinbuf(std::cin.rdbuf()), _lineNb(0), _instructions(&instructions)
 {
 	if (this->_file)
 	{
 		this->_ifs.open(this->_file, std::ios::binary | std::ios::in);
 		if (this->_ifs.good() == false)
 		{
-			throw Lexer::OpenFileException(this->_file);
+			throw Lexer::LexerException(this->_lineNb, this->_file);
 		}
 		/* Assignation d'un nouveau buffer à std::cin */
 		std::cin.rdbuf(this->_ifs.rdbuf());
@@ -82,20 +62,18 @@ Lexer & Lexer::operator=(Lexer const & rhs)
 
 void	Lexer::tokenise( Token & token )
 {
-	std::size_t		inst_size;
 	std::string		line("");
-	Lexer::t_result	opVal;
 
-	inst_size = sizeof(this->_instructions) / sizeof(this->_instructions[0]);
 	/* Lecture des commandes */
 	while (std::getline(std::cin, line))
 	{
 		std::istringstream					ss(line);
 		std::istream_iterator<std::string>	beg(ss), end;
 		std::vector<std::string>			tokens(beg, end);
-		std::size_t							i;
+		Instructions::t_result				result;
 
-		for (i = 0; i < tokens.size(); i++)
+		this->_lineNb++;
+		for (std::size_t i = 0; i < tokens.size(); i++)
 		{
 			if (tokens.at(i)[0] == ';' && tokens.at(i)[1] != ';')
 			{
@@ -103,123 +81,41 @@ void	Lexer::tokenise( Token & token )
 				break ;
 			}
 		}
-		if (tokens.size() != 0)
+		if (tokens.size() == 0)
+			continue ;
+		if (tokens.at(0)[1] == ';')
+		// if (tokens.at(0).compare(";;") == 0)
+			break ;
+		try
 		{
-			if (tokens.at(0)[1] == ';')
-			// if (tokens.at(0).compare(";;") == 0)
-				break ;
-			for (i = 0; i < inst_size; i++)
-			{
-				if (tokens.at(0).compare(this->_instructions[i].name) == 0)
-				{
-					if (tokens.size() != this->_instructions[i].nbArgs + 1)
-						throw Lexer::LexerException(this->_lineNb, "Wrong number of argument for instruction", tokens.at(0));
-					if (this->_instructions[i].nbArgs != 0)
-					{
-						opVal = Lexer::checkOperand(tokens.at(1));
-						token.addToken(this->_instructions[i].type, opVal.value, opVal.type);
-					}
-					else
-						token.addToken(this->_instructions[i].type);
-					break ;
-				}
-			}
-			if (i >= inst_size)
-				throw LexerException(this->_lineNb, "Unknown instruction", tokens.at(0));
+			result = this->_instructions->getInstruction(tokens);
+			token.addToken(result.typeToken, result.typeOperand, result.valueOperand);
 		}
-		this->_lineNb++;
-	}
-}
-
-Lexer::t_result		Lexer::checkOperand(std::string const & operand) const
-{
-	std::size_t	parent_left = operand.find('(');
-	std::size_t	parent_right = operand.find(')');
-	std::string	value;
-	std::size_t	value_size = sizeof(this->_values) / sizeof(this->_values[0]);
-	std::size_t	i;
-
-	if (parent_left == std::string::npos || parent_right == std::string::npos)
-		throw Lexer::LexerException(this->_lineNb, "Invalid operand format: Missing '(' or ')'", operand);
-	value = operand.substr(parent_left + 1, parent_right - parent_left - 1);
-	for (i = 0; i < value_size; i++)
-	{
-		if (operand.compare(0, parent_left, this->_values[i].name) == 0)
+		catch (Instructions::InstructionsException & e)
 		{
-			(this->*this->_values[i].checkValue)(value);
-			return (Lexer::t_result){ this->_values[i].type, value };
+			throw Lexer::LexerException(this->_lineNb, e);
 		}
 	}
-	throw Lexer::LexerException(this->_lineNb, "Invalid operand format: Unrecognized operand", operand);
 }
 
-void			Lexer::intOperandCheck(std::string const & value) const
-{
-	std::size_t		i;
-
-	if (value.length() == 0)
-		throw Lexer::LexerException(this->_lineNb, "Invalid operand value: Empty value", value);
-	for (i = 0; i < value.length(); i++)
-	{
-		if ((value.at(i) == '-' && i != 0)
-		|| !(value.at(i) >= '0' && value.at(i) <= '9'))
-			throw Lexer::LexerException(this->_lineNb, "Invalid operand value", value);
-	}
-}
-
-void			Lexer::floatOperandCheck(std::string const & value) const
-{
-	std::size_t	i;
-	int			found_point;
-
-	found_point = 0;
-	if (value.length() == 0)
-		throw Lexer::LexerException(this->_lineNb, "Invalid operand value: Empty value", value);
-	for (i = 0; i < value.length(); i++)
-	{
-		if ((value.at(i) == '-' && i != 0)
-			|| !(value.at(i) >= '0' && value.at(i) <= '9'))
-		{
-			found_point = (value.at(i) == '.');
-			if (found_point == 0)
-				throw Lexer::LexerException(this->_lineNb, "Invalid operand value", value);
-		}
-	}
-	if (found_point == 0)
-			throw Lexer::LexerException(this->_lineNb, "Invalid operand value: Missing point", value);
-}
-
-void			Lexer::doubleOperandCheck(std::string const & value) const
-{
-	std::size_t	i;
-	char		found_point;
-
-	found_point = 0;
-	if (value.length() == 0)
-		throw Lexer::LexerException(this->_lineNb, "Invalid operand value: Empty value", value);
-	for (i = 0; i < value.length(); i++)
-	{
-		if ((value.at(i) == '-' && i != 0)
-			|| !(value.at(i) >= '0' && value.at(i) <= '9'))
-		{
-			found_point = (value.at(i) == '.');
-			if (found_point == 0)
-				throw Lexer::LexerException(this->_lineNb, "Invalid operand value", value);
-		}
-	}
-	if (found_point == 0)
-			throw Lexer::LexerException(this->_lineNb, "Invalid operand value: Missing point", value);
-}
-
-Lexer::OpenFileException::OpenFileException(const char *file)
+Lexer::LexerException::LexerException(std::size_t lineNb, const char *file)
 {
 	if (file != nullptr)
-		this->_error = "Unable to open file : '" + std::string(file) + "'";
+		this->_error = "Line " + std::to_string(lineNb) + ": " + "Unable to open file : '" + std::string(file) + "'";
 	else
-		this->_error = "Unable to read from std::cin";
+		this->_error = "Line " + std::to_string(lineNb) + ": " + "Unable to read from std::cin";
 }
 
-Lexer::LexerException::LexerException(std::size_t lineNb, const char *error, std::string const & instruction)
+Lexer::LexerException::LexerException(std::size_t lineNb, Instructions const * instrutions)
 {
-	this->_error = "Line " + std::to_string(lineNb) + ": " + std::string(error) + ": '" + instruction + "'";
+	if (instrutions != nullptr)
+		this->_error = "Line " + std::to_string(lineNb) + ": " + "Unknown error";
+	else
+		this->_error = "Line " + std::to_string(lineNb) + ": " + "No instructions given";
+}
+
+
+Lexer::LexerException::LexerException(std::size_t lineNb, Instructions::InstructionsException & e)
+{
+	this->_error = "Line " + std::to_string(lineNb) + ": " + std::string(e.what());
 }

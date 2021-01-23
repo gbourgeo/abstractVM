@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/06 01:41:01 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/02 14:20:07 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:47:14 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int Operand::getPrecision( void ) const
 	return this->_precision;
 }
 
-eOperandType Operand::getType( void ) const
+IOperand::eOperandType Operand::getType( void ) const
 {
 	return this->_type;
 }

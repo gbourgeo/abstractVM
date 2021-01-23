@@ -4,8 +4,8 @@
 ;-
 ;
 
-push int32(42)
-push int32(33)
+push int8(42)
+push int16(33)
 
 add
 

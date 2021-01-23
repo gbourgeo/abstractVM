@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/02 13:13:55 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/02 13:26:15 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:47:58 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ public:
 	OperandFactory(OperandFactory const & src);
 	OperandFactory & operator=(OperandFactory const & rhs);
 
-	IOperand const * createOperand( eOperandType type, std::string const & value) const;
+	IOperand const * createOperand( IOperand::eOperandType type, std::string const & value) const;
 
 private:
 	IOperand const * createInt8( std::string const & value) const;

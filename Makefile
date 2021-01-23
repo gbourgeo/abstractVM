@@ -6,7 +6,7 @@
 #    By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/07/26 21:29:25 by gbourgeo          #+#    #+#              #
-#    Updated: 2021/01/17 21:32:56 by gbourgeo         ###   ########.fr        #
+#    Updated: 2021/01/22 19:38:58 by gbourgeo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ SRC_D	= srcs/
 SRC_F	= main.cpp			\
 		Operand.cpp			\
 		OperandFactory.cpp	\
+		Instructions.cpp	\
 		Lexer.cpp			\
 		Parser.cpp			\
 		Token.cpp			\

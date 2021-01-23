@@ -6,13 +6,13 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/17 21:30:59 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/23 15:45:56 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Token.hpp"
 
-Token::Token()
+Token::Token(): _idx(0)
 {}
 
 Token::~Token()
@@ -36,29 +36,22 @@ Token & Token::operator=(Token const & rhs)
 	{
 		this->_tokens.clear();
 		this->_tokens = rhs._tokens;
+		this->_idx = rhs._idx;
 	}
 	return *this;
 }
 
-void	Token::addToken(eTokenType tokenType, std::string const & operandValue, eOperandType opType)
+void	Token::addToken(Token::eTokenType typeToken, IOperand::eOperandType typeOperand, std::string const & valueOperand)
 {
-	this->_tokens.push_back( (struct s_token){ tokenType, this->_op.createOperand(opType, operandValue) } );
-}
-
-void	Token::addToken(eTokenType tokenType)
-{
-	this->_tokens.push_back( (struct s_token){ tokenType, nullptr } );
+	this->_tokens.push_back(
+		(struct s_token){ typeToken, this->_op.createOperand(typeOperand, valueOperand) });
 }
 
 Token::t_token	const * Token::getNextToken( void )
 {
-	static std::size_t	i = 0;
-
-	if (i < this->_tokens.size())
+	if (this->_idx < this->_tokens.size())
 	{
-		t_token	* tok = &this->_tokens.at(i);
-		i++;
-		return tok;
+		return &this->_tokens.at(this->_idx++);
 	}
 	return nullptr;
 }
