@@ -6,15 +6,17 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 18:53:33 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:56:27 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/24 13:26:26 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef INSTRUCTIONS_HPP
 # define INSTRUCTIONS_HPP
 
+# include <vector>
+# include <string>
 # include <stdexcept>
-# include "Token.hpp"
+# include "OperandFactory.hpp"
 
 class Instructions
 {
@@ -24,16 +26,29 @@ public:
 	Instructions(Instructions const & src);
 	Instructions & operator=(Instructions const & rhs);
 
-	/* Operand value structure */
-	typedef struct	s_result
+	/* Instruction types enumeration */
+	enum eInstructionType
 	{
-		Token::eTokenType		typeToken;
-		IOperand::eOperandType	typeOperand;
-		std::string				valueOperand;
-	}				t_result;
+		Push,
+		Pop,
+		Dump,
+		Assert,
+		Add,
+		Sub,
+		Mul,
+		Div,
+		Mod,
+		Print,
+		Exit,
+	};
 
-	t_result const	getInstruction(std::vector<std::string> const & token) const;
-	void			checkArgumentValue(IOperand::eOperandType type, std::string const & value) const;
+	eInstructionType		getInstruction(std::string const & token) const;
+	std::size_t				getInstructionNbArgs(std::string const & token) const;
+	IOperand::eOperandType	getOperand(std::string const & token) const;
+	std::string				getOperandValue(std::string const & token) const;
+
+	const char *			getInstruction(eInstructionType type) const;
+	const char *			getOperand(IOperand::eOperandType type) const;
 
 	class	InstructionsException : public std::exception
 	{
@@ -52,6 +67,7 @@ private:
 	void			intOperandCheck(std::string const & value) const;
 	void			floatOperandCheck(std::string const & value) const;
 	void			doubleOperandCheck(std::string const & value) const;
+	void			noCheck(std::string const & value) const;
 
 	/*
 	* Instructions structure
@@ -60,7 +76,7 @@ private:
 	typedef struct	s_instructions
 	{
 		const char			*name;
-		Token::eTokenType	type;
+		eInstructionType	type;
 		std::size_t			nbArgs;
 	}				t_inst;
 	/*
@@ -69,7 +85,7 @@ private:
 	*/
 	typedef struct	s_operands
 	{
-		const char				*name;
+		const char		*name;
 		IOperand::eOperandType	type;
 		void	(Instructions::*checkOperand)(std::string const &) const;
 	}				t_ope;

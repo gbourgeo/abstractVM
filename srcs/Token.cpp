@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:45:56 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/24 13:39:44 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,6 @@ Token::Token(): _idx(0)
 
 Token::~Token()
 {
-	auto freePointer = [](Token::t_token const & token) {
-		if (token.ope != nullptr)
-			delete token.ope;
-	};
-	std::for_each(this->_tokens.cbegin(), this->_tokens.cend(), freePointer);
 	this->_tokens.clear();
 }
 
@@ -41,17 +36,26 @@ Token & Token::operator=(Token const & rhs)
 	return *this;
 }
 
-void	Token::addToken(Token::eTokenType typeToken, IOperand::eOperandType typeOperand, std::string const & valueOperand)
+void					Token::addToken(Token::t_token token)
 {
-	this->_tokens.push_back(
-		(struct s_token){ typeToken, this->_op.createOperand(typeOperand, valueOperand) });
+	this->_tokens.push_back(token);
 }
 
-Token::t_token	const * Token::getNextToken( void )
+Token::t_token const	*Token::getNextToken( void )
 {
 	if (this->_idx < this->_tokens.size())
 	{
 		return &this->_tokens.at(this->_idx++);
 	}
 	return nullptr;
+}
+
+Token::t_token const	*Token::getLastToken( void ) const
+{
+	return &this->_tokens.back();
+}
+
+void Token::reset(void)
+{
+	this->_idx = 0;
 }

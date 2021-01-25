@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/02 13:13:53 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:55:45 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/25 21:11:46 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,25 +47,25 @@ IOperand const * OperandFactory::createOperand( IOperand::eOperandType type, std
 
 IOperand const * OperandFactory::createInt8( std::string const & value) const
 {
-	return new Operand(value, IOperand::Int8, 0);
+	return new Operand<int8_t>(value, IOperand::Int8, IOperand::Int8_p);
 }
 
 IOperand const * OperandFactory::createInt16( std::string const & value) const
 {
-	return new Operand(value, IOperand::Int16, 0);
+	return new Operand<int16_t>(value, IOperand::Int16, IOperand::Int16_p);
 }
 
 IOperand const * OperandFactory::createInt32( std::string const & value) const
 {
-	return new Operand(value, IOperand::Int32, 0);
+	return new Operand<int32_t>(value, IOperand::Int32, IOperand::Int32_p);
 }
 
 IOperand const * OperandFactory::createFloat( std::string const & value) const
 {
-	return new Operand(value, IOperand::Float, 0);
+	return new Operand<float>(value, IOperand::Float, IOperand::Float_p);
 }
 
 IOperand const * OperandFactory::createDouble( std::string const & value) const
 {
-	return new Operand(value, IOperand::Double, 0);
+	return new Operand<double>(value, IOperand::Double, IOperand::Double_p);
 }

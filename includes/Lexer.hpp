@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/17 11:51:19 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:37:07 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/24 13:34:17 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ public:
 		LexerException(std::size_t lineNb, const char *file);
 		LexerException(std::size_t lineNb, Instructions const * instrutions);
 		LexerException(std::size_t lineNb, Instructions::InstructionsException & e);
+		LexerException(std::size_t lineNb, const char *error, std::string const & value);
+		LexerException(std::size_t lineNb, const char *error, Token::t_token const * token);
 
 		virtual const char * what() const throw()
 		{
@@ -54,7 +56,7 @@ private:
 	std::fstream		_ifs;
 	std::streambuf		*_cinbuf;
 	std::size_t			_lineNb;
-	Instructions const	*_instructions;
+	Instructions 		const *_instructions;
 };
 
 # endif // Lexer_HPP

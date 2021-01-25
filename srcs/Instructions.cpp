@@ -6,24 +6,24 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 18:53:22 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:56:21 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/24 13:27:31 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Instructions.hpp"
 
 Instructions::t_inst	Instructions::_instructions[] = {
-	{ "push",   Token::Push,   1 },
-	{ "pop",    Token::Pop,    0 },
-	{ "dump",   Token::Dump,   0 },
-	{ "assert", Token::Assert, 1 },
-	{ "add",    Token::Add,    0 },
-	{ "sub",    Token::Sub,    0 },
-	{ "mul",    Token::Mul,    0 },
-	{ "div",    Token::Div,    0 },
-	{ "mod",    Token::Mod,    0 },
-	{ "print",  Token::Print,  0 },
-	{ "exit",   Token::Exit,   0 },
+	{ "push",   Instructions::Push,   1 },
+	{ "pop",    Instructions::Pop,    0 },
+	{ "dump",   Instructions::Dump,   0 },
+	{ "assert", Instructions::Assert, 1 },
+	{ "add",    Instructions::Add,    0 },
+	{ "sub",    Instructions::Sub,    0 },
+	{ "mul",    Instructions::Mul,    0 },
+	{ "div",    Instructions::Div,    0 },
+	{ "mod",    Instructions::Mod,    0 },
+	{ "print",  Instructions::Print,  0 },
+	{ "exit",   Instructions::Exit,   0 },
 };
 
 Instructions::t_ope		Instructions::_values[] = {
@@ -32,6 +32,7 @@ Instructions::t_ope		Instructions::_values[] = {
 	{ "int32",  IOperand::Int32 , &Instructions::intOperandCheck },
 	{ "float",  IOperand::Float , &Instructions::floatOperandCheck },
 	{ "double", IOperand::Double, &Instructions::doubleOperandCheck },
+	{ "",       IOperand::None,   &Instructions::noCheck },
 };
 
 Instructions::Instructions()
@@ -54,41 +55,65 @@ Instructions & Instructions::operator=(Instructions const & rhs)
 	return *this;
 }
 
-Instructions::t_result const	Instructions::getInstruction(std::vector<std::string> const & token) const
+Instructions::InstructionsException::InstructionsException(const char * error, std::string const & value)
 {
-	t_result		res;
+	this->_error = value + ": " + std::string(error) + ".";
+}
+
+Instructions::eInstructionType	Instructions::getInstruction(std::string const & token) const
+{
+	for (std::size_t i = 0; i < sizeof(this->_instructions) / sizeof(this->_instructions[0]); i++)
+		if (token.compare(this->_instructions[i].name) == 0)
+			return this->_instructions[i].type;
+	throw Instructions::InstructionsException("Invalid instruction : name unknown", token);
+}
+
+std::size_t						Instructions::getInstructionNbArgs(std::string const & token) const
+{
+	for (std::size_t i = 0; i < sizeof(this->_instructions) / sizeof(this->_instructions[0]); i++)
+		if (token.compare(this->_instructions[i].name) == 0)
+			return this->_instructions[i].nbArgs;
+	throw Instructions::InstructionsException("Invalid instruction : name unknown", token);
+}
+
+IOperand::eOperandType			Instructions::getOperand(std::string const & token) const
+{
+	std::size_t			parent_left;
+
+	parent_left = token.find('(');
+	if (parent_left == std::string::npos)
+		throw Instructions::InstructionsException("Invalid operand format: Missing '('", token);
+	for (std::size_t i = 0; i < sizeof(this->_values) / sizeof(this->_values[0]); i++)
+		if (token.compare(0, parent_left, this->_values[i].name) == 0)
+			return this->_values[i].type;
+	throw Instructions::InstructionsException("Invalid operand : name unknown", token);
+}
+
+std::string						Instructions::getOperandValue(std::string const & token) const
+{
 	std::size_t		parent_left;
 	std::size_t		parent_right;
+	std::string		value;
 
-	res.typeToken = Token::Undefined;
-	res.typeOperand = IOperand::Undefined;
-	res.valueOperand.clear();
-	for (std::size_t i = 0; i < sizeof(this->_instructions) / sizeof(this->_instructions[0]); i++)
-		if (token.at(0).compare(this->_instructions[i].name) == 0)
-		{
-			res.typeToken = this->_instructions[i].type;
-			if (token.size() < this->_instructions[i].nbArgs + 1)
-				throw Instructions::InstructionsException("Invalid instruction: Missing value", token.at(0));
-			if (token.size() > this->_instructions[i].nbArgs + 1)
-				throw Instructions::InstructionsException("Invalid instruction: Too many values", token.at(0));
-			if (this->_instructions[i].nbArgs == 0)
-				return res;
-			parent_left  = token.at(1).find('(');
-			parent_right = token.at(1).find(')');
-			if (parent_left == std::string::npos || parent_right == std::string::npos)
-				throw Instructions::InstructionsException("Invalid operand format: Missing '(' or ')'", token.at(1));
-			for (std::size_t j = 0; j < sizeof(this->_values) / sizeof(this->_values[0]); j++)
-				if (token.at(1).compare(0, parent_left, this->_values[j].name) == 0)
-				{
-					res.typeOperand = this->_values[j].type;
-					res.valueOperand = token.at(1).substr(parent_left + 1, parent_right - parent_left - 1);
-					(this->*this->_values[j].checkOperand)(res.valueOperand);
-					return res;
-				}
-			throw Instructions::InstructionsException("Invalid operand : Unknown name", token.at(1));
-		}
-	throw Instructions::InstructionsException("Invalid instruction : Unknown name", token.at(0));
+	parent_left  = token.find('(');
+	parent_right = token.find(')');
+	if (parent_right == std::string::npos)
+		throw Instructions::InstructionsException("Invalid operand format: Missing ')'", token);
+	value = token.substr(parent_left + 1, parent_right - parent_left - 1);
+	(this->*this->_values[Instructions::getOperand(token)].checkOperand)(value);
+	return value;
 }
+
+const char *			Instructions::getInstruction(eInstructionType type) const
+{
+	return this->_instructions[type].name;
+}
+
+const char *			Instructions::getOperand(IOperand::eOperandType type) const
+{
+	return this->_values[type].name;
+}
+
 
 void			Instructions::intOperandCheck(std::string const & value) const
 {
@@ -145,10 +170,10 @@ void			Instructions::doubleOperandCheck(std::string const & value) const
 		}
 	}
 	if (found_point == 0)
-			throw Instructions::InstructionsException("Invalid operand value: Missing point", value);
+		throw Instructions::InstructionsException("Invalid operand value: Missing point", value);
 }
 
-Instructions::InstructionsException::InstructionsException(const char * error, std::string const & value)
+void			Instructions::noCheck(std::string const & value) const
 {
-	this->_error = value + ": " + std::string(error) + ".";
+	(void)value;
 }

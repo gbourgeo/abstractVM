@@ -22,4 +22,10 @@ pop
 
 assert double(42.42)
 
+pop
+pop
+pop
+
+print ; Should print '*'
+
 exit

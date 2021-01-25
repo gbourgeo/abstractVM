@@ -6,11 +6,14 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/26 21:42:03 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:23:14 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/25 21:18:07 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string>
+#ifndef IOPERAND_HPP
+# define IOPERAND_HPP
+
+# include <string>
 
 class IOperand {
 public:
@@ -21,7 +24,16 @@ public:
 		Int32,
 		Float,
 		Double,
-		Undefined
+		None,
+	};
+
+	enum ePrecision {
+		Int8_p,
+		Int16_p,
+		Int32_p,
+		Float_p,
+		Double_p,
+		None_p,
 	};
 
 	virtual int getPrecision( void ) const = 0; // Precision of the type of the instance
@@ -37,3 +49,5 @@ public:
 
 	virtual ~IOperand( void ) {}
 };
+
+#endif // IOPERAND_HPP

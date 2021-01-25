@@ -6,24 +6,41 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/06 01:41:01 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/23 15:47:14 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/25 21:16:59 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Operand.hpp"
+#include "Instructions.hpp"
 
-Operand::Operand(): _value(0), _type(Int8), _precision(0)
+template<class T>
+Operand<T>::Operand(): _value(0), _type(IOperand::Int8), _precision(IOperand::Int8_p)
 {}
 
-Operand::~Operand()
+template<class T>
+Operand<T>::Operand(std::string const & value, IOperand::eOperandType type, int precision):
+	_s_value(value), _type(type), _precision(precision)
+{
+	if (type == IOperand::Int8 || type == IOperand::Int16 || type == IOperand::Int32)
+		this->_value = std::stoi(value);
+	if (type == IOperand::Float)
+		this->_value = std::stof(value);
+	if (type == IOperand::Double)
+		this->_value = std::stod(value);
+}
+
+template<class T>
+Operand<T>::~Operand()
 {}
 
-Operand::Operand(Operand const & src)
+template<class T>
+Operand<T>::Operand(Operand const & src)
 {
 	*this = src;
 }
 
-Operand & Operand::operator=(Operand const & rhs)
+template<class T>
+Operand<T> & Operand<T>::operator=(Operand<T> const & rhs)
 {
 	if (this != &rhs)
 	{
@@ -34,63 +51,61 @@ Operand & Operand::operator=(Operand const & rhs)
 	return *this;
 }
 
-int Operand::getPrecision( void ) const
+template<class T>
+int					Operand<T>::getPrecision( void ) const
 {
 	return this->_precision;
 }
 
-IOperand::eOperandType Operand::getType( void ) const
+template<class T>
+IOperand::eOperandType	Operand<T>::getType( void ) const
 {
 	return this->_type;
 }
 
-IOperand const * Operand::operator+( IOperand const & rhs ) const
+template<class T>
+IOperand const *	Operand<T>::operator+( IOperand const & rhs ) const
 {
 	(void)rhs;
 	return this;
 }
 
-IOperand const * Operand::operator-( IOperand const & rhs ) const
+template<class T>
+IOperand const * Operand<T>::operator-( IOperand const & rhs ) const
 {
 	(void)rhs;
 	return this;
 }
 
-IOperand const * Operand::operator*( IOperand const & rhs ) const
+template<class T>
+IOperand const * Operand<T>::operator*( IOperand const & rhs ) const
 {
 	(void)rhs;
 	return this;
 }
 
-IOperand const * Operand::operator/( IOperand const & rhs ) const
+template<class T>
+IOperand const * Operand<T>::operator/( IOperand const & rhs ) const
 {
 	(void)rhs;
 	return this;
 }
 
-IOperand const * Operand::operator%( IOperand const & rhs ) const
+template<class T>
+IOperand const * Operand<T>::operator%( IOperand const & rhs ) const
 {
 	(void)rhs;
 	return this;
 }
 
-std::string const & Operand::toString( void ) const
+template<class T>
+std::string const & Operand<T>::toString( void ) const
 {
-	const char	*type[] = {
-		"Int8", "Int16", "Int32", "Float", "Double",
-	};
-	static std::string	ret;
-
-	ret = "Type: " + std::string(type[this->_type])
-		+ ", Value: " + this->_value
-		+ ", Precision: " + std::to_string(this->_precision);
-	return ret;
+	return this->_s_value;
 }
 
-Operand::Operand(std::string const & value, eOperandType type):
-	_value(value), _type(type), _precision(0)
-{}
-
-Operand::Operand(std::string const & value, eOperandType type, int precision):
-	_value(value), _type(type), _precision(precision)
-{}
+template class Operand<int8_t>;
+template class Operand<int16_t>;
+template class Operand<int32_t>;
+template class Operand<float>;
+template class Operand<double>;
