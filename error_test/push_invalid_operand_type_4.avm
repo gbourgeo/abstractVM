@@ -1,0 +1,9 @@
+; ----------------
+; push_invalid_operand_type_4.avm
+; ---------------
+;-
+;
+
+push Int32(32)
+
+exit

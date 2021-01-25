@@ -1,0 +1,11 @@
+; ----------------
+; unknown_instruction_2.avm
+; ---------------
+;-
+;
+
+push int8(16)
+
+printt
+
+exit

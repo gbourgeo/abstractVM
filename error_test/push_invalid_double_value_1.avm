@@ -1,0 +1,9 @@
+; ----------------
+; push_invalid_double_value_1.avm
+; ---------------
+;-
+;
+
+push double(16)
+
+exit

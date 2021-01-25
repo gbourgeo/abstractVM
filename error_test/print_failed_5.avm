@@ -1,0 +1,11 @@
+; ----------------
+; print_failed_5.avm
+; ---------------
+;-
+;
+
+push double(0.0)
+
+print
+
+exit

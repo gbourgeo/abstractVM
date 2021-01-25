@@ -1,0 +1,11 @@
+; ----------------
+; assert_operand_failed.avm
+; ---------------
+;-
+;
+
+push int8(8)
+
+assert int16(8)
+
+exit

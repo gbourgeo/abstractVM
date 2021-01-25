@@ -1,0 +1,9 @@
+; ----------------
+; push_too_many_argument.avm
+; ---------------
+;-
+;
+
+push int8(1) int16(2)
+
+exit

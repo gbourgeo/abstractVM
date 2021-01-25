@@ -1,0 +1,9 @@
+; ----------------
+; push_invalid_float_value_3.avm
+; ---------------
+;-
+;
+
+push float(16)
+
+exit

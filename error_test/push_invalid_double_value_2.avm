@@ -1,0 +1,10 @@
+; ----------------
+; push_invalid_double_value_2.avm
+; ---------------
+;-
+;
+
+
+push double()
+
+exit

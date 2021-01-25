@@ -1,0 +1,9 @@
+; ----------------
+; push_invalid_int_value_1.avm
+; ---------------
+;-
+;
+
+push int8()
+
+exit

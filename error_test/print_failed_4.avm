@@ -1,0 +1,11 @@
+; ----------------
+; print_failed_4.avm
+; ---------------
+;-
+;
+
+push float(0.0)
+
+print
+
+exit
