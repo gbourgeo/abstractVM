@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/17 11:53:47 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/24 13:11:52 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 10:52:18 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,17 @@ private:
 	bool						_loop;
 
 	/* Tokens instructions functions */
-	void			push(Token::t_token const * token);
-	void			pop(Token::t_token const * token);
-	void			dump(Token::t_token const * token);
-	void			assert(Token::t_token const * token);
-	void			add(Token::t_token const * token);
-	void			sub(Token::t_token const * token);
-	void			mul(Token::t_token const * token);
-	void			div(Token::t_token const * token);
-	void			mod(Token::t_token const * token);
-	void			print(Token::t_token const * token);
-	void			exit(Token::t_token const * token);
+	void			_push(Token::t_token const * token);
+	void			_pop(Token::t_token const * token);
+	void			_dump(Token::t_token const * token);
+	void			_assert(Token::t_token const * token);
+	void			_add(Token::t_token const * token);
+	void			_sub(Token::t_token const * token);
+	void			_mul(Token::t_token const * token);
+	void			_div(Token::t_token const * token);
+	void			_mod(Token::t_token const * token);
+	void			_print(Token::t_token const * token);
+	void			_exit(Token::t_token const * token);
 };
 
 

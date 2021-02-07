@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:27 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/24 13:39:44 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 13:53:12 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,4 @@ Token::t_token const	*Token::getNextToken( void )
 Token::t_token const	*Token::getLastToken( void ) const
 {
 	return &this->_tokens.back();
-}
-
-void Token::reset(void)
-{
-	this->_idx = 0;
 }

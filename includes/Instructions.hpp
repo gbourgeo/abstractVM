@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 18:53:33 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/24 13:26:26 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 13:16:59 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include <vector>
 # include <string>
 # include <stdexcept>
-# include "OperandFactory.hpp"
+# include <limits>
+# include "IOperand.hpp"
 
 class Instructions
 {
@@ -43,9 +44,9 @@ public:
 	};
 
 	eInstructionType		getInstruction(std::string const & token) const;
-	std::size_t				getInstructionNbArgs(std::string const & token) const;
+	std::size_t				getInstructionNbArgs(std::string const & token, std::size_t nbArgs) const;
 	IOperand::eOperandType	getOperand(std::string const & token) const;
-	std::string				getOperandValue(std::string const & token) const;
+	std::string				getOperandValue(IOperand::eOperandType type, std::string const & token) const;
 
 	const char *			getInstruction(eInstructionType type) const;
 	const char *			getOperand(IOperand::eOperandType type) const;
@@ -64,10 +65,9 @@ public:
 	};
 
 private:
-	void			intOperandCheck(std::string const & value) const;
-	void			floatOperandCheck(std::string const & value) const;
-	void			doubleOperandCheck(std::string const & value) const;
-	void			noCheck(std::string const & value) const;
+	void			intOperandCheck(IOperand::eOperandType type, std::string const & value) const;
+	void			pointOperandCheck(IOperand::eOperandType type, std::string const & value) const;
+	void			noCheck(IOperand::eOperandType type, std::string const & value) const;
 
 	/*
 	* Instructions structure
@@ -87,7 +87,7 @@ private:
 	{
 		const char		*name;
 		IOperand::eOperandType	type;
-		void	(Instructions::*checkOperand)(std::string const &) const;
+		void	(Instructions::*checkOperand)(IOperand::eOperandType, std::string const &) const;
 	}				t_ope;
 
 	static t_inst	_instructions[];

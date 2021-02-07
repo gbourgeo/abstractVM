@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 20:47:12 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/24 13:15:30 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 13:53:02 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ public:
 	t_token const	* getNextToken( void );
 	t_token const	* getLastToken( void ) const;
 
-	void reset(void); // A supprimer !
 private:
 	/* Tokens list */
 	std::vector<t_token>	_tokens;

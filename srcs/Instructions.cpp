@@ -6,13 +6,14 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 18:53:22 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/24 13:27:31 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 13:29:16 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Instructions.hpp"
 
 Instructions::t_inst	Instructions::_instructions[] = {
+	/* Name     Type                  Nb_args */
 	{ "push",   Instructions::Push,   1 },
 	{ "pop",    Instructions::Pop,    0 },
 	{ "dump",   Instructions::Dump,   0 },
@@ -30,8 +31,8 @@ Instructions::t_ope		Instructions::_values[] = {
 	{ "int8",   IOperand::Int8  , &Instructions::intOperandCheck },
 	{ "int16",  IOperand::Int16 , &Instructions::intOperandCheck },
 	{ "int32",  IOperand::Int32 , &Instructions::intOperandCheck },
-	{ "float",  IOperand::Float , &Instructions::floatOperandCheck },
-	{ "double", IOperand::Double, &Instructions::doubleOperandCheck },
+	{ "float",  IOperand::Float , &Instructions::pointOperandCheck },
+	{ "double", IOperand::Double, &Instructions::pointOperandCheck },
 	{ "",       IOperand::None,   &Instructions::noCheck },
 };
 
@@ -57,7 +58,7 @@ Instructions & Instructions::operator=(Instructions const & rhs)
 
 Instructions::InstructionsException::InstructionsException(const char * error, std::string const & value)
 {
-	this->_error = value + ": " + std::string(error) + ".";
+	this->_error = "Error : " + std::string(error) + " : " + value + ".";
 }
 
 Instructions::eInstructionType	Instructions::getInstruction(std::string const & token) const
@@ -65,15 +66,21 @@ Instructions::eInstructionType	Instructions::getInstruction(std::string const & 
 	for (std::size_t i = 0; i < sizeof(this->_instructions) / sizeof(this->_instructions[0]); i++)
 		if (token.compare(this->_instructions[i].name) == 0)
 			return this->_instructions[i].type;
-	throw Instructions::InstructionsException("Invalid instruction : name unknown", token);
+	throw Instructions::InstructionsException("Instruction name unknown", token);
 }
 
-std::size_t						Instructions::getInstructionNbArgs(std::string const & token) const
+std::size_t						Instructions::getInstructionNbArgs(std::string const & token, std::size_t nbArgs) const
 {
 	for (std::size_t i = 0; i < sizeof(this->_instructions) / sizeof(this->_instructions[0]); i++)
 		if (token.compare(this->_instructions[i].name) == 0)
+		{
+			if (nbArgs < this->_instructions[i].nbArgs + 1)
+				throw Instructions::InstructionsException("Missing argument for instruction", token);
+			if (nbArgs > this->_instructions[i].nbArgs + 1)
+				throw Instructions::InstructionsException("Too many values for instruction", token);
 			return this->_instructions[i].nbArgs;
-	throw Instructions::InstructionsException("Invalid instruction : name unknown", token);
+		}
+	throw Instructions::InstructionsException("Instruction name unknown", token);
 }
 
 IOperand::eOperandType			Instructions::getOperand(std::string const & token) const
@@ -82,14 +89,14 @@ IOperand::eOperandType			Instructions::getOperand(std::string const & token) con
 
 	parent_left = token.find('(');
 	if (parent_left == std::string::npos)
-		throw Instructions::InstructionsException("Invalid operand format: Missing '('", token);
+		throw Instructions::InstructionsException("Invalid operand format : Missing '('", token);
 	for (std::size_t i = 0; i < sizeof(this->_values) / sizeof(this->_values[0]); i++)
 		if (token.compare(0, parent_left, this->_values[i].name) == 0)
 			return this->_values[i].type;
-	throw Instructions::InstructionsException("Invalid operand : name unknown", token);
+	throw Instructions::InstructionsException("Operand name unknown", token);
 }
 
-std::string						Instructions::getOperandValue(std::string const & token) const
+std::string						Instructions::getOperandValue(IOperand::eOperandType type, std::string const & token) const
 {
 	std::size_t		parent_left;
 	std::size_t		parent_right;
@@ -98,9 +105,9 @@ std::string						Instructions::getOperandValue(std::string const & token) const
 	parent_left  = token.find('(');
 	parent_right = token.find(')');
 	if (parent_right == std::string::npos)
-		throw Instructions::InstructionsException("Invalid operand format: Missing ')'", token);
+		throw Instructions::InstructionsException("Invalid operand format : Missing ')'", token);
 	value = token.substr(parent_left + 1, parent_right - parent_left - 1);
-	(this->*this->_values[Instructions::getOperand(token)].checkOperand)(value);
+	(this->*this->_values[Instructions::getOperand(token)].checkOperand)(type, value);
 	return value;
 }
 
@@ -114,66 +121,92 @@ const char *			Instructions::getOperand(IOperand::eOperandType type) const
 	return this->_values[type].name;
 }
 
-
-void			Instructions::intOperandCheck(std::string const & value) const
+void			Instructions::intOperandCheck(IOperand::eOperandType type, std::string const & value) const
 {
-	std::size_t		i;
+	std::size_t	i;
+	long		lvalue;
 
 	if (value.length() == 0)
-		throw Instructions::InstructionsException("Invalid operand value: Empty value", value);
-	for (i = 0; i < value.length(); i++)
+		throw Instructions::InstructionsException("Operand value empty", value);
+	for (i = (value.at(0) == '-'); i < value.length(); i++)
 	{
-		if ((value.at(i) == '-' && i != 0)
-		|| !(value.at(i) >= '0' && value.at(i) <= '9'))
+		if (!(value.at(i) >= '0' && value.at(i) <= '9'))
 			throw Instructions::InstructionsException("Invalid operand value", value);
+	}
+	try
+	{
+		lvalue = std::stol(value);
+	}
+	catch (...)
+	{
+			throw Instructions::InstructionsException("Invalid operand value", value);
+	}
+	if (type == IOperand::Int8)
+	{
+		if (lvalue < std::numeric_limits<int8_t>::min())
+			throw Instructions::InstructionsException("Underflow on operand value", value);
+		if (lvalue > std::numeric_limits<int8_t>::max())
+			throw Instructions::InstructionsException("Overflow on operand value", value);
+	}
+	else if (type == IOperand::Int16)
+	{
+		if (lvalue < std::numeric_limits<int16_t>::min())
+			throw Instructions::InstructionsException("Underflow on operand value", value);
+		if (lvalue > std::numeric_limits<int16_t>::max())
+			throw Instructions::InstructionsException("Overflow on operand value", value);
+	}
+	else if (type == IOperand::Int32)
+	{
+		if (lvalue < std::numeric_limits<int32_t>::min())
+			throw Instructions::InstructionsException("Underflow on operand value", value);
+		if (lvalue > std::numeric_limits<int32_t>::max())
+			throw Instructions::InstructionsException("Overflow on operand value", value);
 	}
 }
 
-void			Instructions::floatOperandCheck(std::string const & value) const
+void			Instructions::pointOperandCheck(IOperand::eOperandType type, std::string const & value) const
 {
 	std::size_t	i;
 	int			found_point;
+	std::string	fstring;
 
 	found_point = 0;
 	if (value.length() == 0)
-		throw Instructions::InstructionsException("Invalid operand value: Empty value", value);
-	for (i = 0; i < value.length(); i++)
+		throw Instructions::InstructionsException("Operand value empty", value);
+	for (i = (value.at(0) == '-'); i < value.length(); i++)
 	{
-		if ((value.at(i) == '-' && i != 0)
-			|| !(value.at(i) >= '0' && value.at(i) <= '9'))
-		{
-			found_point = (value.at(i) == '.');
-			if (found_point == 0)
-				throw Instructions::InstructionsException("Invalid operand value", value);
-		}
+		if (std::isdigit(value.at(i)))
+			continue ;
+		if (found_point != 0)
+			throw Instructions::InstructionsException("Invalid operand value", value);
+		found_point = (value.at(i) == '.');
+		if (found_point == 0)
+			throw Instructions::InstructionsException("Invalid operand value", value);
 	}
 	if (found_point == 0)
-			throw Instructions::InstructionsException("Invalid operand value: Missing point", value);
-}
-
-void			Instructions::doubleOperandCheck(std::string const & value) const
-{
-	std::size_t	i;
-	char		found_point;
-
-	found_point = 0;
-	if (value.length() == 0)
-		throw Instructions::InstructionsException("Invalid operand value: Empty value", value);
-	for (i = 0; i < value.length(); i++)
+			throw Instructions::InstructionsException("Invalid operand value : Missing point", value);
+	try
 	{
-		if ((value.at(i) == '-' && i != 0)
-			|| !(value.at(i) >= '0' && value.at(i) <= '9'))
-		{
-			found_point = (value.at(i) == '.');
-			if (found_point == 0)
-				throw Instructions::InstructionsException("Invalid operand value", value);
-		}
+		if (type == IOperand::Float)
+			fstring = std::to_string(std::stof(value));
+		else if (type == IOperand::Double)
+			fstring = std::to_string(std::stod(value));
 	}
-	if (found_point == 0)
-		throw Instructions::InstructionsException("Invalid operand value: Missing point", value);
+	catch (...)
+	{
+		throw Instructions::InstructionsException("Invalid operand value", value);
+	}
+	if (fstring.compare(value) != 0)
+	{
+		if (value.find('-') != std::string::npos)
+			throw Instructions::InstructionsException("Underflow on operand value", value);
+		else
+			throw Instructions::InstructionsException("Overflow on operand value", value);
+	}
 }
 
-void			Instructions::noCheck(std::string const & value) const
+void			Instructions::noCheck(IOperand::eOperandType type, std::string const & value) const
 {
+	(void)type;
 	(void)value;
 }

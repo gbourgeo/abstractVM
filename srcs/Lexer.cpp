@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 11:29:03 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/24 14:11:23 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 12:37:15 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,37 +73,38 @@ void	Lexer::tokenise( Token & token )
 		Token::t_token						result;
 
 		this->_lineNb++;
+		/* Effacement des commentaires et
+		* check de fin de capture du l'instruction spéciale ';;'
+		*/
 		for (std::size_t i = 0; i < tokens.size(); i++)
 		{
-			if (tokens.at(i)[0] == ';' && tokens.at(i)[1] != ';')
+			if (tokens.at(i).at(0) == ';')
 			{
-				tokens.erase(tokens.begin() + i, tokens.end());
+				if (tokens.at(i).length() == 2 && tokens.at(i).at(1) == ';')
+					tokens.at(i) = std::string("exit");
+				else
+					tokens.erase(tokens.begin() + i, tokens.end());
 				break ;
 			}
 		}
 		if (tokens.size() == 0)
 			continue ;
-		if (tokens.at(0)[1] == ';')
-		// if (tokens.at(0).compare(";;") == 0)
-		{
-			token.addToken((Token::t_token){ this->_lineNb, Instructions::Exit, IOperand::None, tokens.at(0) });
-			break ;
-		}
 		try
 		{
 			result.lineNb = this->_lineNb;
+			/* Valid instruction */
 			result.instruction = this->_instructions->getInstruction(tokens.at(0));
-			std::size_t nbArgs = this->_instructions->getInstructionNbArgs(tokens.at(0));
-			if (tokens.size() < nbArgs + 1)
-				throw Lexer::LexerException(this->_lineNb, "Invalid instruction: Missing value", tokens.at(0));
-			if (tokens.size() > nbArgs + 1)
-				throw Lexer::LexerException(this->_lineNb, "Invalid instruction: Too many values", tokens.at(0));
-			if (nbArgs > 0)
+			/* Valid argument number */
+			if (this->_instructions->getInstructionNbArgs(tokens.at(0), tokens.size()))
 			{
+				/* Valid operand */
 				result.operand = this->_instructions->getOperand(tokens.at(1));
-				result.operandValue = this->_instructions->getOperandValue(tokens.at(1));
+				/* Valid operand value */
+				result.operandValue = this->_instructions->getOperandValue(result.operand, tokens.at(1));
 			}
 			token.addToken(result);
+			if (result.instruction == Instructions::Exit)
+				break ;
 		}
 		catch (Instructions::InstructionsException & e)
 		{

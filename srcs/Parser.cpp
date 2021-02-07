@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/17 11:53:23 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/25 21:20:20 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/01/31 14:06:35 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,32 +44,29 @@ Parser & Parser::operator=(Parser const & rhs)
 void			Parser::parse( Token & tokens )
 {
 	static void		(Parser::*execute[])( Token::t_token const * ) = {
-		&Parser::push,
-		&Parser::pop,
-		&Parser::dump,
-		&Parser::assert,
-		&Parser::add,
-		&Parser::sub,
-		&Parser::mul,
-		&Parser::div,
-		&Parser::mod,
-		&Parser::print,
-		&Parser::exit,
+		&Parser::_push,
+		&Parser::_pop,
+		&Parser::_dump,
+		&Parser::_assert,
+		&Parser::_add,
+		&Parser::_sub,
+		&Parser::_mul,
+		&Parser::_div,
+		&Parser::_mod,
+		&Parser::_print,
+		&Parser::_exit,
 	};
 
-	std::cout << "Instruction	Operand	Value" << std::endl;
-	for (Token::t_token const *t = tokens.getNextToken(); t; t = tokens.getNextToken())
-	{
-		std::cout << t->instruction << "	";// << this->_instructions[t->type].name;
-		std::cout << t->operand << "	";
-		std::cout << t->operandValue;
-		std::cout << std::endl;
-	}
-	tokens.reset();
-	std::cout << std::endl << "Execute :" << std::endl;
 	for (Token::t_token const *t = tokens.getNextToken(); t && this->_loop == true; t = tokens.getNextToken())
 	{
-		(this->*execute[t->instruction])(t);
+		try
+		{
+			(this->*execute[t->instruction])(t);
+		}
+		catch (Operand<int8_t>::OperandException & e)
+		{
+			throw Parser::ParserException(t->lineNb, e.what());
+		}
 	}
 	if (this->_loop == true)
 	{
@@ -85,12 +82,12 @@ Parser::ParserException::ParserException(std::size_t lineNb, const char *error)
 	this->_error = "Line " + std::to_string(lineNb) + " : Error : " + std::string(error);
 }
 
-void				Parser::push(Token::t_token const * token)
+void				Parser::_push(Token::t_token const * token)
 {
 	this->_stack.push_front(this->_op.createOperand(token->operand, token->operandValue));
 }
 
-void				Parser::pop(Token::t_token const * token)
+void				Parser::_pop(Token::t_token const * token)
 {
 	if (this->_stack.empty())
 		throw Parser::ParserException(token->lineNb, "Pop on an empty stack");
@@ -98,17 +95,16 @@ void				Parser::pop(Token::t_token const * token)
 	this->_stack.pop_front();
 }
 
-void				Parser::dump(Token::t_token const * token)
+void				Parser::_dump(Token::t_token const * token)
 {
 	(void)token;
-	// std::cout << "Dumping stack:" << std::endl;
 	std::for_each(this->_stack.begin(), this->_stack.end(),
 		[](IOperand const * ope) {
 			std::cout << ope->toString() << std::endl;
 		});
 }
 
-void				Parser::assert(Token::t_token const * token)
+void				Parser::_assert(Token::t_token const * token)
 {
 	IOperand const	*ptr;
 	std::string		err;
@@ -119,38 +115,104 @@ void				Parser::assert(Token::t_token const * token)
 	{
 		ptr = this->_op.createOperand(token->operand, token->operandValue);
 		err = "Assert : " + this->_stack.front()->toString() + " != ";
-		err += ptr->toString();
+		err += ptr->toString() + ".";
 		delete ptr;
 		throw Parser::ParserException(token->lineNb, err.c_str());
 	}
 }
 
-void				Parser::add(Token::t_token const * token)
+void				Parser::_add(Token::t_token const * token)
 {
-	(void)token;
+	IOperand const	*first;
+	IOperand const	*second;
+	IOperand const	*result;
+
+	if (this->_stack.size() < 2)
+		throw Parser::ParserException(token->lineNb, "Addition operation on stack less than 2 operands.");
+	first = this->_stack.front();
+	this->_stack.pop_front();
+	second = this->_stack.front();
+	this->_stack.pop_front();
+	result = *second + *first;
+	this->_stack.push_front(result);
+	delete first;
+	delete second;
 }
 
-void				Parser::sub(Token::t_token const * token)
+void				Parser::_sub(Token::t_token const * token)
 {
-	(void)token;
+	IOperand const	*first;
+	IOperand const	*second;
+	IOperand const	*result;
+
+	if (this->_stack.size() < 2)
+		throw Parser::ParserException(token->lineNb, "Substraction operation on stack less than 2 operands.");
+	first = this->_stack.front();
+	this->_stack.pop_front();
+	second = this->_stack.front();
+	this->_stack.pop_front();
+	result = *first - *second;
+	// result = *second - *first;
+	this->_stack.push_front(result);
+	delete first;
+	delete second;
 }
 
-void				Parser::mul(Token::t_token const * token)
+void				Parser::_mul(Token::t_token const * token)
 {
-	(void)token;
+	IOperand const	*first;
+	IOperand const	*second;
+	IOperand const	*result;
+
+	if (this->_stack.size() < 2)
+		throw Parser::ParserException(token->lineNb, "Multiplication operation on stack less than 2 operands.");
+	first = this->_stack.front();
+	this->_stack.pop_front();
+	second = this->_stack.front();
+	this->_stack.pop_front();
+	result = *second * *first;
+	this->_stack.push_front(result);
+	delete first;
+	delete second;
 }
 
-void				Parser::div(Token::t_token const * token)
+void				Parser::_div(Token::t_token const * token)
 {
-	(void)token;
+	IOperand const	*first;
+	IOperand const	*second;
+	IOperand const	*result;
+
+	if (this->_stack.size() < 2)
+		throw Parser::ParserException(token->lineNb, "Division operation on stack less than 2 operands.");
+	first = this->_stack.front();
+	this->_stack.pop_front();
+	second = this->_stack.front();
+	this->_stack.pop_front();
+	result = *second / *first;
+	this->_stack.push_front(result);
+	delete first;
+	delete second;
 }
 
-void				Parser::mod(Token::t_token const * token)
+void				Parser::_mod(Token::t_token const * token)
 {
-	(void)token;
+	IOperand const	*first;
+	IOperand const	*second;
+	IOperand const	*result;
+
+	if (this->_stack.size() < 2)
+		throw Parser::ParserException(token->lineNb, "Modulo operation on stack less than 2 operands.");
+	first = this->_stack.front();
+	this->_stack.pop_front();
+	second = this->_stack.front();
+	this->_stack.pop_front();
+	result = *second % *first;
+	this->_stack.push_front(result);
+	delete first;
+	delete second;
 }
 
-void				Parser::print(Token::t_token const * token)
+void				Parser::_print(Token::t_token const * token)
 {
 	int				value;
 	std::string		err;
@@ -163,14 +225,15 @@ void				Parser::print(Token::t_token const * token)
 	}
 	if (this->_stack.front()->getType() != IOperand::Int8)
 	{
-		err = "Print " + this->_stack.front()->toString() + " != " + std::string(this->_instructions->getOperand(IOperand::Int8)) + "()";
+		err = "Printing value of a type " + std::string(this->_instructions->getOperand(this->_stack.front()->getType())) + "().";
+		err += " Expected " + std::string(this->_instructions->getOperand(IOperand::Int8)) + "().";
 		throw Parser::ParserException(token->lineNb, err.c_str());
 	}
 	value = std::stoi(this->_stack.front()->toString());
 	std::cout << static_cast<char>(value) << std::endl;
 }
 
-void				Parser::exit(Token::t_token const * token)
+void				Parser::_exit(Token::t_token const * token)
 {
 	(void)token;
 	this->_loop = false;
