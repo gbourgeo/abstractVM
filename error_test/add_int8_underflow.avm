@@ -1,0 +1,14 @@
+; ----------------
+; add_int8_underflow.avm
+; ---------------
+;-
+;
+
+push int8(-126)
+push int8(-3)
+
+dump
+add
+dump
+
+exit

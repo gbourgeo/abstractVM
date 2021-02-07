@@ -1,0 +1,14 @@
+; ----------------
+; add_int8_overflow.avm
+; ---------------
+;-
+;
+
+push int8(126)
+push int8(2)
+
+dump
+add
+dump
+
+exit
