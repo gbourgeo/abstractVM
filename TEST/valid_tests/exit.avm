@@ -1,0 +1,15 @@
+;;;;;;;;;;;;;;;
+;
+; exit.avm
+;
+;;;;;;;;;;;;;;;
+
+push int32(32)
+
+dump
+
+exit
+
+push int32(64)
+
+dump

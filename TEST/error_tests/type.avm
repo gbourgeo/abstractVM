@@ -1,0 +1,23 @@
+;;;;;;;;;;;;;;;;
+;
+; type.avm
+;
+;;;;;;;;;;;;;;;
+
+push int16(0)
+push int8(16)
+
+sub
+
+dump
+pop
+
+push int16(16)
+push int8(0)
+
+sub
+
+dump
+pop
+
+exit
