@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/22 18:53:22 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/31 13:29:16 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/02/14 12:20:27 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,12 +167,16 @@ void			Instructions::intOperandCheck(IOperand::eOperandType type, std::string co
 void			Instructions::pointOperandCheck(IOperand::eOperandType type, std::string const & value) const
 {
 	std::size_t	i;
-	int			found_point;
 	std::string	fstring;
+	int			found_point;
 
+	(void)type;
 	found_point = 0;
 	if (value.length() == 0)
 		throw Instructions::InstructionsException("Operand value empty", value);
+	/* Check value is only digit and have a single '.' in value,
+	 * skip the negative character at the begining if present
+	 */
 	for (i = (value.at(0) == '-'); i < value.length(); i++)
 	{
 		if (std::isdigit(value.at(i)))
@@ -183,26 +187,15 @@ void			Instructions::pointOperandCheck(IOperand::eOperandType type, std::string 
 		if (found_point == 0)
 			throw Instructions::InstructionsException("Invalid operand value", value);
 	}
+	/* Validation on decimal value */
 	if (found_point == 0)
-			throw Instructions::InstructionsException("Invalid operand value : Missing point", value);
-	try
-	{
-		if (type == IOperand::Float)
-			fstring = std::to_string(std::stof(value));
-		else if (type == IOperand::Double)
-			fstring = std::to_string(std::stod(value));
-	}
-	catch (...)
-	{
-		throw Instructions::InstructionsException("Invalid operand value", value);
-	}
-	if (fstring.compare(value) != 0)
-	{
-		if (value.find('-') != std::string::npos)
-			throw Instructions::InstructionsException("Underflow on operand value", value);
-		else
-			throw Instructions::InstructionsException("Overflow on operand value", value);
-	}
+		throw Instructions::InstructionsException("Invalid operand value : Missing point", value);
+	/* Validation on decimal value */
+	int point_len = value.length() - value.find('.') - 1;
+	if (point_len > 6)
+		throw Instructions::InstructionsException("Invalid operand value : Floating point too long", value);
+	/* Validation on Over/underflow value */
+	Instructions::intOperandCheck(IOperand::Int32, value.substr(0, value.find('.')));
 }
 
 void			Instructions::noCheck(IOperand::eOperandType type, std::string const & value) const

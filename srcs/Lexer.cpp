@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/03 11:29:03 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/31 12:37:15 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/02/14 12:20:19 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,13 @@ void	Lexer::tokenise( Token & token )
 
 		this->_lineNb++;
 		/* Effacement des commentaires et
-		* check de fin de capture du l'instruction spéciale ';;'
+		* check de fin de capture de l'instruction spéciale ';;'
 		*/
 		for (std::size_t i = 0; i < tokens.size(); i++)
 		{
 			if (tokens.at(i).at(0) == ';')
 			{
-				if (tokens.at(i).length() == 2 && tokens.at(i).at(1) == ';')
+				if (tokens.at(i).length() == 2 && tokens.at(i).at(1) == ';' && tokens.size() == 1)
 					tokens.at(i) = std::string("exit");
 				else
 					tokens.erase(tokens.begin() + i, tokens.end());

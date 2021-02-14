@@ -6,7 +6,7 @@
 /*   By: gbourgeo <gbourgeo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/17 11:53:23 by gbourgeo          #+#    #+#             */
-/*   Updated: 2021/01/31 14:06:35 by gbourgeo         ###   ########.fr       */
+/*   Updated: 2021/02/14 10:34:19 by gbourgeo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,19 +106,12 @@ void				Parser::_dump(Token::t_token const * token)
 
 void				Parser::_assert(Token::t_token const * token)
 {
-	IOperand const	*ptr;
-	std::string		err;
-
-	err.clear();
-	if (this->_stack.front()->getType() != token->operand
-	|| this->_stack.front()->toString() != token->operandValue)
-	{
-		ptr = this->_op.createOperand(token->operand, token->operandValue);
-		err = "Assert : " + this->_stack.front()->toString() + " != ";
-		err += ptr->toString() + ".";
-		delete ptr;
-		throw Parser::ParserException(token->lineNb, err.c_str());
-	}
+	if (this->_stack.size() == 0)
+		throw Parser::ParserException(token->lineNb, "Assertion on empty stack.");
+	if (this->_stack.front()->getType() != token->operand)
+		throw Parser::ParserException(token->lineNb, "Assertion on invalid token type.");
+	if (this->_stack.front()->toString() != token->operandValue)
+		throw Parser::ParserException(token->lineNb, "Assertion on invalid token value.");
 }
 
 void				Parser::_add(Token::t_token const * token)
@@ -151,8 +144,7 @@ void				Parser::_sub(Token::t_token const * token)
 	this->_stack.pop_front();
 	second = this->_stack.front();
 	this->_stack.pop_front();
-	result = *first - *second;
-	// result = *second - *first;
+	result = *second - *first;
 	this->_stack.push_front(result);
 	delete first;
 	delete second;
